@@ -1,5 +1,12 @@
 config:
-  loglevel: Exception
+  logging:
+    level: debug
+    outputs: file,syslog
+    logfile: /var/log/url_monitor.log
+    syslog:
+      server: 127.0.0.1
+      socket: udp
+    logformat: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
   identity_providers:
     basicAuthExampleProvider:
         HTTPBasicAuth:
