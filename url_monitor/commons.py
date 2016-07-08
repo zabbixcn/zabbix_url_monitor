@@ -8,6 +8,7 @@ from requests.auth import HTTPDigestAuth
 from requests_oauthlib import OAuth1
 import importlib
 
+
 def omnipath(data_object, type, element, throw_error_or_mark_none='none'):
     """ Used to pull path expressions out of json or java path. """
     value = None
@@ -49,9 +50,9 @@ class WebCaller(object):
             identity_provider = identity_providers[identity_provider]
             auth_kwargs = identity_provider.values()[0]
         except KeyError, err:
-            error = "\n\n" + str(err) + " defined in testSet as identity_provider but is undeclared in identity_providers!\n1"
+            error = "\n\n" + \
+                str(err) + " defined in testSet as identity_provider but is undeclared in identity_providers!\n1"
             self.logging.exception("KeyError: " + str(err) + str(error))
-
 
         # If provider is undefined, we get TypeError
         try:
@@ -78,25 +79,33 @@ class WebCaller(object):
             # requests_python_module/requestAuthClassname from the config entry.
             # Split the / to determine import statements t.
             try:
-                module_strname = [ x for x in identity_provider][0].split('/')[0]
-                class_strname = [ x for x in identity_provider][0].split('/')[1]
+                module_strname = [x for x in identity_provider][
+                    0].split('/')[0]
+                class_strname = [x for x in identity_provider][0].split('/')[1]
             except IndexError, err:
-                error = "\n\n`" + str(provider_name) + "` is incomplete missing '/' char to seperate Module_Name from Class_Name\n1"
+                error = "\n\n`" + \
+                    str(provider_name) + \
+                    "` is incomplete missing '/' char to seperate Module_Name from Class_Name\n1"
                 self.logging.exception("IndexError: " + str(err) + str(error))
 
             # Try to import the specified module
             try:
                 _module = __import__(module_strname)
             except ImportError, err:
-                error = "\n\n" + str(module_strname) + "/" + str(class_strname) + " might be an invalid module/class pairing at " +  str(module_strname) + "\n1"
+                error = "\n\n" + str(module_strname) + "/" + str(class_strname) + \
+                    " might be an invalid module/class pairing at " + \
+                        str(module_strname) + "\n1"
                 self.logging.exception("ImportError: " + str(err) + str(error))
 
             # And try to reference a class instance
             try:
                 external_requests_auth_class = getattr(_module, class_strname)
             except AttributeError, err:
-                error = "\n\n" + str(module_strname) + "." + str(class_strname) + " might be an invalid class name at " +  str(class_strname) + "\n1"
-                self.logging.exception("AttributeError: " + str(err) + str(error))
+                error = "\n\n" + str(module_strname) + "." + str(class_strname) + \
+                    " might be an invalid class name at " + \
+                        str(class_strname) + "\n1"
+                self.logging.exception(
+                    "AttributeError: " + str(err) + str(error))
 
             # Set the external auth handler.
             self.session.auth = external_requests_auth_class(**auth_kwargs)
@@ -116,14 +125,16 @@ class WebCaller(object):
         resp_code = str(request.status_code).split()
 
         if 'any'.lower() in expected_codes:
-            # Allow any HTTP code ranges within RFC 2616 - Hypertext Transfer Protocol -- HTTP/1.1
+            # Allow any HTTP code ranges within RFC 2616 - Hypertext Transfer
+            # Protocol -- HTTP/1.1
             expected_codes.remove('any')
-            expected_codes = expected_codes + range(100,103) \
-                           + range(200,226) + range(300,308) \
-                           + range(400,451) + range(500,510)
-            expected_codes = map(str,expected_codes)
+            expected_codes = expected_codes + range(100, 103) \
+                + range(200, 226) + range(300, 308) \
+                + range(400, 451) + range(500, 510)
+            expected_codes = map(str, expected_codes)
 
-        # filter returns empty if code not found, returns found expected_codes if they are found.
+        # filter returns empty if code not found, returns found expected_codes
+        # if they are found.
         valid_response_code = filter(lambda item: any(
             x in item for x in resp_code), expected_codes)
 
