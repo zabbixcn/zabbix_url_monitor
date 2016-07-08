@@ -218,17 +218,11 @@ def main(arguements=None):
 
     configinstance = configuration.ConfigObject()
     configinstance.load_yaml_file(args.config)
-    configinstance.preFlight()
+    logger = configinstance.getLogger(args.loglevel)
+
+    configinstance.preFlightCheck()
     config = configinstance.load()
-    logger = logging.getLogger(packaging.package)
-    args.loglevel = configinstance.get_log_level(args.loglevel)
-    # Setup file handlers
-    handler = logging.FileHandler('/var/log/url_monitor.log')
-    handler.setLevel(args.loglevel)
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-    logging.basicConfig(level=args.loglevel)
+
     if args.COMMAND == "check":
         failed_exits = []
         for testSet in config['checks']:
@@ -243,7 +237,7 @@ def main(arguements=None):
                 if exit_val != 0:
                     failed_exits.append(testSet['key'])
         if len(failed_exits) > 0:
-            raise Exception(str(len(failed_exits)) + " checks have failed: " + str(failed_exits) + "\n1")
+            logger.exception(str(len(failed_exits)) + " checks have failed: " + str(failed_exits) + "\n1")
     elif args.COMMAND == "discover":
         discover(args,configinstance,logger)
 

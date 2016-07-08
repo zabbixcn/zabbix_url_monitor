@@ -8,7 +8,6 @@ from requests.auth import HTTPDigestAuth
 from requests_oauthlib import OAuth1
 import importlib
 
-
 def omnipath(data_object, type, element, throw_error_or_mark_none='none'):
     """ Used to pull path expressions out of json or java path. """
     value = None

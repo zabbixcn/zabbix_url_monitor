@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import yaml
 import logging
+import packaging
 
 class ConfigObject(object):
     """ This class makes YAML configuration
@@ -119,18 +120,38 @@ class ConfigObject(object):
         else:
             return logging.ERROR
 
-    def preFlight(self):
+    def getLogger(self,loglevel):
+        """ Returns a logger instance to be used throughout. This was moved into configuration to
+            get logging abilities as soon as possible in the application.
+        """
+        self.logger = logging.getLogger(packaging.package)
+        loglevel = self.get_log_level(loglevel)
+        # Setup file handle
+        handler = logging.FileHandler('/var/log/url_monitor.log')
+        handler.setLevel(loglevel)
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        handler.setFormatter(formatter)
+        self.logger.addHandler(handler)
+
+        logging.basicConfig(level=loglevel)
+        self.logger.info("Logger initialized.")
+        return self.logger
+
+    def preFlightCheck(self):
         """ Trys loading all the config objects for zabbix conf. This can be expanded to do
             all syntax checking in this config class, instead of in the program logic as it is
-            mostly right now. """
+            mostly right now.
 
+            It is a check class. This should NOT be used for program references.
+            (Doesnt use logger for exceptions as it pre-dates logger instanciation.)
+            """
         # Ensure base config elements exist.
         try:
             self.config['config']
         except KeyError, err:
             error = "\n\nError: Config missing zabbix: " + str(err) + " structure in config under config\n" \
             + "Ensure \n  " + str(err) + ":  is defined\n1"
-            raise Exception("KeyError: " + str(err) + str(error))
+            self.logger.exception("KeyError: " + str(err) + str(error))
             exit(1)
 
         try:
@@ -138,7 +159,7 @@ class ConfigObject(object):
         except KeyError, err:
             error = "\n\nError: Config missing: " + str(err) + " structure in config under config\n" \
             + "Ensure \n  config:\n     " + str(err) + ":  is defined\n1"
-            raise Exception("KeyError: " + str(err) + str(error))
+            self.logger.exception("KeyError: " + str(err) + str(error))
             exit(1)
 
         try:
@@ -148,7 +169,7 @@ class ConfigObject(object):
         except KeyError, err:
             error = "\n\nError: Config missing: " + str(err) + " structure in config under config\n" \
             + "Ensure \n  config:\n     zabbix:\n        " + str(err) + ":  is defined\n1"
-            raise Exception("KeyError: " + str(err) + str(error))
+            self.logger.exception("KeyError: " + str(err) + str(error))
             exit(1)
 
         # Ensure identity items exist
@@ -157,7 +178,7 @@ class ConfigObject(object):
         except KeyError, err:
             error = "\n\nError: Config missing: " + str(err) + " structure in config under config\n" \
             + "Ensure \n  config:\n     " + str(err) + ":  is defined\n1"
-            raise Exception("KeyError: " + str(err) + str(error))
+            self.logger.exception("KeyError: " + str(err) + str(error))
             exit(1)
 
 
@@ -167,7 +188,7 @@ class ConfigObject(object):
         except AttributeError, err:
             error = "\n\nError: Config missing: " + str(err) + " structure in config: identity_providers\n" \
             + "Ensure \n  identity_providers follows documentation\n1"
-            raise Exception("AttributeError: " + str(err) + str(error))
+            self.logger.exception("AttributeError: " + str(err) + str(error))
             exit(1)
 
         for provider in self._loadConfigIdentityProviders():
@@ -177,6 +198,8 @@ class ConfigObject(object):
                 for kwarg in kwargs:
                     kwarg
 
+
+        self.logger.info("Pre-flight config test OK")
 
     def _loadTestSetList(self):
         """ Used to prepare format of data for the checker functions
