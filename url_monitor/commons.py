@@ -50,8 +50,8 @@ class WebCaller(object):
             identity_provider = identity_providers[identity_provider]
             auth_kwargs = identity_provider.values()[0]
         except KeyError, err:
-            error = "\n\n" + \
-                str(err) + " defined in testSet as identity_provider but is undeclared in identity_providers!\n1"
+            error = str(
+                err) + " defined in testSet as identity_provider but is undeclared in identity_providers!\n1"
             self.logging.exception("KeyError: " + str(err) + str(error))
 
         # If provider is undefined, we get TypeError
@@ -83,8 +83,7 @@ class WebCaller(object):
                     0].split('/')[0]
                 class_strname = [x for x in identity_provider][0].split('/')[1]
             except IndexError, err:
-                error = "\n\n`" + \
-                    str(provider_name) + \
+                error = str(provider_name) + \
                     "` is incomplete missing '/' char to seperate Module_Name from Class_Name\n1"
                 self.logging.exception("IndexError: " + str(err) + str(error))
 
@@ -92,18 +91,18 @@ class WebCaller(object):
             try:
                 _module = __import__(module_strname)
             except ImportError, err:
-                error = "\n\n" + str(module_strname) + "/" + str(class_strname) + \
+                error = str(module_strname) + "/" + str(class_strname) + \
                     " might be an invalid module/class pairing at " + \
-                        str(module_strname) + "\n1"
+                    str(module_strname) + "\n1"
                 self.logging.exception("ImportError: " + str(err) + str(error))
 
             # And try to reference a class instance
             try:
                 external_requests_auth_class = getattr(_module, class_strname)
             except AttributeError, err:
-                error = "\n\n" + str(module_strname) + "." + str(class_strname) + \
+                error = str(module_strname) + "." + str(class_strname) + \
                     " might be an invalid class name at " + \
-                        str(class_strname) + "\n1"
+                    str(class_strname) + "\n1"
                 self.logging.exception(
                     "AttributeError: " + str(err) + str(error))
 

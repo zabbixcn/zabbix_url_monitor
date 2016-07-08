@@ -45,7 +45,7 @@ def check(testSet, configinstance, logger):
         uri = testSet['data']['uri']
     except KeyError, err:
         # We're missing the uri aren't we?
-        error = "\n\nError: Missing " + \
+        error = "Error: Missing " + \
             str(err) + " under testSet item " + \
             str(testSet['key']) + ", check cannot run.\n1"
         raise Exception("KeyError: " + str(err) + str(error))
@@ -54,7 +54,7 @@ def check(testSet, configinstance, logger):
             testSet['data']['ok_http_code']), identity_provider=testSet['data']['identity_provider'])
     except KeyError, err:
         # We're missing ok code arent we?
-        error = "\n\nError: Missing " + str(err) + " under testSet item " + str(testSet['key']) + "\n" \
+        error = "Error: Missing " + str(err) + " under testSet item " + str(testSet['key']) + "\n" \
             + "If you don't know `ok_http_code: any` will cover most services.\n1"
         raise Exception("KeyError: " + str(err) + str(error))
     except requests.exceptions.RequestException as e:
