@@ -222,6 +222,12 @@ def main(arguements=None):
     config = configinstance.load()
     logger = logging.getLogger(packaging.package)
     args.loglevel = configinstance.get_log_level(args.loglevel)
+    # Setup file handlers
+    handler = logging.FileHandler('/var/log/url_monitor.log')
+    handler.setLevel(args.loglevel)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
     logging.basicConfig(level=args.loglevel)
     if args.COMMAND == "check":
         failed_exits = []

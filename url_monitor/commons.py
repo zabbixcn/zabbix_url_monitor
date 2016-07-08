@@ -36,7 +36,8 @@ class WebCaller(object):
         Bring logging instance in.
         Set session.auth and session_headers to none by default
         """
-        logging = logging
+        self.logging = logging
+
         self.session = None
         self.session_headers = None
 
@@ -50,7 +51,7 @@ class WebCaller(object):
             auth_kwargs = identity_provider.values()[0]
         except KeyError, err:
             error = "\n\n" + str(err) + " defined in testSet as identity_provider but is undeclared in identity_providers!\n1"
-            raise Exception("KeyError: " + str(err) + str(error))
+            self.logging.exception("KeyError: " + str(err) + str(error))
 
 
         # If provider is undefined, we get TypeError
@@ -82,21 +83,21 @@ class WebCaller(object):
                 class_strname = [ x for x in identity_provider][0].split('/')[1]
             except IndexError, err:
                 error = "\n\n`" + str(provider_name) + "` is incomplete missing '/' char to seperate Module_Name from Class_Name\n1"
-                raise Exception("IndexError: " + str(err) + str(error))
+                self.logging.exception("IndexError: " + str(err) + str(error))
 
             # Try to import the specified module
             try:
                 _module = __import__(module_strname)
             except ImportError, err:
                 error = "\n\n" + str(module_strname) + "/" + str(class_strname) + " might be an invalid module/class pairing at " +  str(module_strname) + "\n1"
-                raise Exception("ImportError: " + str(err) + str(error))
+                self.logging.exception("ImportError: " + str(err) + str(error))
 
             # And try to reference a class instance
             try:
                 external_requests_auth_class = getattr(_module, class_strname)
             except AttributeError, err:
                 error = "\n\n" + str(module_strname) + "." + str(class_strname) + " might be an invalid class name at " +  str(class_strname) + "\n1"
-                raise Exception("AttributeError: " + str(err) + str(error))
+                self.logging.exception("AttributeError: " + str(err) + str(error))
 
             # Set the external auth handler.
             self.session.auth = external_requests_auth_class(**auth_kwargs)
@@ -128,7 +129,7 @@ class WebCaller(object):
             x in item for x in resp_code), expected_codes)
 
         if not valid_response_code:
-            raise requests.exceptions.HTTPError(
+            self.logging.exception(
                 'Bad HTTP response. Expected one of ' + str(expected_codes) + " recieved " + str(resp_code))
 
         return request
