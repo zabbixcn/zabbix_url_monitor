@@ -84,7 +84,7 @@ class ConfigObject(object):
             except KeyError, err:
                 error = "Error: Missing " + \
                     str(err) + " under testSet item " + \
-                    str(testSet['key']) + ", discover cannot run.\n1"
+                    str(testSet['key']) + ", discover cannot run."
                 raise Exception("KeyError: " + str(err) + str(error))
 
             try:
@@ -92,7 +92,7 @@ class ConfigObject(object):
             except KeyError, err:
                 error = "Error: Missing " + \
                     str(err) + " under testSet item " + \
-                    str(testSet['key']) + ", discover cannot run.\n1"
+                    str(testSet['key']) + ", discover cannot run."
                 raise Exception("KeyError: " + str(err) + str(error))
 
             for element in testSet['data']['testElements']:  # For every test element
@@ -101,7 +101,7 @@ class ConfigObject(object):
                 except KeyError, err:
                     error = "Error: Missing " + \
                         str(err) + " under testElements in " + \
-                        str(testSet['key']) + ", discover cannot run.\n1"
+                        str(testSet['key']) + ", discover cannot run."
                     raise Exception("KeyError: " + str(err) + str(error))
                 for datatype in datatypes:
                     possible_datatypes.append(datatype)
@@ -161,7 +161,7 @@ class ConfigObject(object):
             self.config['config']['logging']['logformat']
         except KeyError, err:
             error = "Error: Config missing: " + str(err) + " structure in config under config\n" \
-                + "Ensure \n  config:\n     " + str(err) + ":  is defined\n1"
+                + "Ensure \n  config:\n     " + str(err) + ":  is defined"
             raise Exception("KeyError: " + str(err) + str(error))
             exit(1)
 
@@ -180,7 +180,7 @@ class ConfigObject(object):
             except KeyError, err:
                 error = "Error: Config missing: " + str(err) + " structure in config under config\n" \
                     + "Ensure \n  config:\n     " + \
-                        str(err) + ":  is defined\n1"
+                        str(err) + ":  is defined"
                 raise Exception("KeyError: " + str(err) + str(error))
                 exit(1)
             filehandler.setLevel(loglevel)
@@ -197,7 +197,7 @@ class ConfigObject(object):
             except KeyError, err:
                 error = "Error: Config missing: " + str(err) + " structure in config under config\n" \
                     + "Ensure \n  config:\n     " + \
-                        str(err) + ":  is defined\n1"
+                        str(err) + ":  is defined"
                 raise Exception("KeyError: " + str(err) + str(error))
                 exit(1)
 
@@ -237,7 +237,7 @@ class ConfigObject(object):
             self.config['config']
         except KeyError, err:
             error = "Error: Config missing zabbix: " + str(err) + " structure in config under config\n" \
-                + "Ensure \n  " + str(err) + ":  is defined\n1"
+                + "Ensure \n  " + str(err) + ":  is defined"
             self.logger.exception("KeyError: " + str(err) + str(error))
             exit(1)
 
@@ -245,7 +245,7 @@ class ConfigObject(object):
             self.config['config']['zabbix']
         except KeyError, err:
             error = "Error: Config missing: " + str(err) + " structure in config under config\n" \
-                + "Ensure \n  config:\n     " + str(err) + ":  is defined\n1"
+                + "Ensure \n  config:\n     " + str(err) + ":  is defined"
             self.logger.exception("KeyError: " + str(err) + str(error))
             exit(1)
 
@@ -256,7 +256,7 @@ class ConfigObject(object):
         except KeyError, err:
             error = "Error: Config missing: " + str(err) + " structure in config under config\n" \
                 + "Ensure \n  config:\n     zabbix:\n        " + \
-                    str(err) + ":  is defined\n1"
+                    str(err) + ":  is defined"
             self.logger.exception("KeyError: " + str(err) + str(error))
             exit(1)
 
@@ -265,7 +265,7 @@ class ConfigObject(object):
             self.config['config']['identity_providers']
         except KeyError, err:
             error = "Error: Config missing: " + str(err) + " structure in config under config\n" \
-                + "Ensure \n  config:\n     " + str(err) + ":  is defined\n1"
+                + "Ensure \n  config:\n     " + str(err) + ":  is defined"
             self.logger.exception("KeyError: " + str(err) + str(error))
             exit(1)
 
@@ -274,7 +274,7 @@ class ConfigObject(object):
                 provider
         except AttributeError, err:
             error = "Error: Config missing: " + str(err) + " structure in config: identity_providers\n" \
-                + "Ensure \n  identity_providers follows documentation\n1"
+                + "Ensure \n  identity_providers follows documentation"
             self.logger.exception("AttributeError: " + str(err) + str(error))
             exit(1)
 

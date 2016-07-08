@@ -51,7 +51,7 @@ class WebCaller(object):
             auth_kwargs = identity_provider.values()[0]
         except KeyError, err:
             error = str(
-                err) + " defined in testSet as identity_provider but is undeclared in identity_providers!\n1"
+                err) + " defined in testSet as identity_provider but is undeclared in identity_providers!"
             self.logging.exception("KeyError: " + str(err) + str(error))
 
         # If provider is undefined, we get TypeError
@@ -84,7 +84,7 @@ class WebCaller(object):
                 class_strname = [x for x in identity_provider][0].split('/')[1]
             except IndexError, err:
                 error = str(provider_name) + \
-                    "` is incomplete missing '/' char to seperate Module_Name from Class_Name\n1"
+                    "` is incomplete missing '/' char to seperate Module_Name from Class_Name"
                 self.logging.exception("IndexError: " + str(err) + str(error))
 
             # Try to import the specified module
@@ -93,7 +93,7 @@ class WebCaller(object):
             except ImportError, err:
                 error = str(module_strname) + "/" + str(class_strname) + \
                     " might be an invalid module/class pairing at " + \
-                    str(module_strname) + "\n1"
+                    str(module_strname) + ""
                 self.logging.exception("ImportError: " + str(err) + str(error))
 
             # And try to reference a class instance
@@ -102,7 +102,7 @@ class WebCaller(object):
             except AttributeError, err:
                 error = str(module_strname) + "." + str(class_strname) + \
                     " might be an invalid class name at " + \
-                    str(class_strname) + "\n1"
+                    str(class_strname) + ""
                 self.logging.exception(
                     "AttributeError: " + str(err) + str(error))
 

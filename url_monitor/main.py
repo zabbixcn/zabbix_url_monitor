@@ -47,7 +47,7 @@ def check(testSet, configinstance, logger):
         # We're missing the uri aren't we?
         error = "Error: Missing " + \
             str(err) + " under testSet item " + \
-            str(testSet['key']) + ", check cannot run.\n1"
+            str(testSet['key']) + ", check cannot run."
         raise Exception("KeyError: " + str(err) + str(error))
     try:
         response = webinstance.run(config, uri, verify=True, expected_http_status=str(
@@ -55,7 +55,7 @@ def check(testSet, configinstance, logger):
     except KeyError, err:
         # We're missing ok code arent we?
         error = "Error: Missing " + str(err) + " under testSet item " + str(testSet['key']) + "\n" \
-            + "If you don't know `ok_http_code: any` will cover most services.\n1"
+            + "If you don't know `ok_http_code: any` will cover most services."
         raise Exception("KeyError: " + str(err) + str(error))
     except requests.exceptions.RequestException as e:
         logging.error("Error: Requests exception " + str(e))
@@ -257,7 +257,7 @@ def main(arguements=None):
                 logger.exception(e)
         if len(failed_exits) > 0:
             logger.exception(str(len(failed_exits)) +
-                             " checks have failed: " + str(failed_exits) + "\n1")
+                             " checks have failed: " + str(failed_exits) + "")
     elif args.COMMAND == "discover":
         discover(args, configinstance, logger)
 
