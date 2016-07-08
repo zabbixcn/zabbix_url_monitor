@@ -226,16 +226,19 @@ def main(arguements=None):
     if args.COMMAND == "check":
         failed_exits = []
         for testSet in config['checks']:
-            if args.key != None:
-                if testSet['key'] == args.key:
+            try: # Catch all exceptions
+                if args.key != None:
+                    if testSet['key'] == args.key:
+                        exit_val = check(testSet,configinstance,logger)
+                        if exit_val != 0:
+                            failed_exits.append(testSet['key'])
+                else:
                     exit_val = check(testSet,configinstance,logger)
+
                     if exit_val != 0:
                         failed_exits.append(testSet['key'])
-            else:
-                exit_val = check(testSet,configinstance,logger)
-
-                if exit_val != 0:
-                    failed_exits.append(testSet['key'])
+            except Exception as e:
+                logger.exception(e)
         if len(failed_exits) > 0:
             logger.exception(str(len(failed_exits)) + " checks have failed: " + str(failed_exits) + "\n1")
     elif args.COMMAND == "discover":
