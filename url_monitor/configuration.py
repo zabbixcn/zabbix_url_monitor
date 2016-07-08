@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import yaml
-import logging
+import logging, socket
 import packaging
+import logging.handlers
 
 class ConfigObject(object):
     """ This class makes YAML configuration
@@ -98,11 +99,11 @@ class ConfigObject(object):
                     possible_datatypes.append(datatype)
 
         return str(self._uniq(possible_datatypes))
-    def get_log_level(self,debug_level=None):
+    def getLogLevel(self,debug_level=None):
         """ Allow user-configurable log-leveling """
         try:
             if debug_level == None:
-                debug_level = self.config['config']['loglevel']
+                debug_level = self.config['config']['logging']['level']
         except KeyError, err:
             print("Error: Missing " + str(err) + " in config under config: loglevel.\nTry config: loglevel: Exceptions")
             print("1")
@@ -121,17 +122,88 @@ class ConfigObject(object):
             return logging.ERROR
 
     def getLogger(self,loglevel):
-        """ Returns a logger instance to be used throughout. This was moved into configuration to
-            get logging abilities as soon as possible in the application.
+        """ Returns a logger instance, used throughout codebase.
+            This will set up a logger using syslog or file logging (or both)
+            depending on the setting used in configuration.
+
+            This supports two types of logging options
+            One by file:
+              logging:
+                level: debug
+                outputs: file
+                logfile: /var/log/url_monitor.log
+                logformat: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+            One by syslog:
+              logging:
+                level: debug
+                outputs: syslog
+                syslog:
+                    server: 127.0.0.1:514
+                    socket: tcp
+                logformat: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+            You can also enable both by setting outputs with commas.
         """
+        try: # Basic config lint
+            self.config['config']['logging']['outputs']
+            self.config['config']['logging']['level']
+            self.config['config']['logging']['logformat']
+        except KeyError, err:
+            error = "\n\nError: Config missing: " + str(err) + " structure in config under config\n" \
+            + "Ensure \n  config:\n     " + str(err) + ":  is defined\n1"
+            raise Exception("KeyError: " + str(err) + str(error))
+            exit(1)
+
         self.logger = logging.getLogger(packaging.package)
-        loglevel = self.get_log_level(loglevel)
-        # Setup file handle
-        handler = logging.FileHandler('/var/log/url_monitor.log')
-        handler.setLevel(loglevel)
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        handler.setFormatter(formatter)
-        self.logger.addHandler(handler)
+        loglevel    = self.getLogLevel(loglevel)
+        formatter   = logging.Formatter(self.config['config']['logging']['logformat'])
+
+        log_outputs = self.config['config']['logging']['outputs'].split(',')
+
+        if "file" in log_outputs:
+            # Add handler for file outputs
+            try: # Quick validation
+                filehandler = logging.FileHandler(self.config['config']['logging']['logfile'])
+            except KeyError, err:
+                error = "\n\nError: Config missing: " + str(err) + " structure in config under config\n" \
+                + "Ensure \n  config:\n     " + str(err) + ":  is defined\n1"
+                raise Exception("KeyError: " + str(err) + str(error))
+                exit(1)
+            filehandler.setLevel(loglevel)
+            self.logger.addHandler(filehandler)
+            filehandler.setFormatter(formatter)
+
+        if "syslog" in log_outputs:
+            # Add handler for syslog outputs
+
+            try: # Quick validation
+                self.config['config']['logging']['syslog']
+                self.config['config']['logging']['syslog']['server']
+                self.config['config']['logging']['syslog']['socket']
+            except KeyError, err:
+                error = "\n\nError: Config missing: " + str(err) + " structure in config under config\n" \
+                + "Ensure \n  config:\n     " + str(err) + ":  is defined\n1"
+                raise Exception("KeyError: " + str(err) + str(error))
+                exit(1)
+
+            loghost = self.config['config']['logging']['syslog']['server']
+            # Detect if port uses non defaults.
+            if ":" in loghost:
+                loghost = loghost.split(':')[0], int(loghost.split(':')[1])
+            else:
+                loghost = loghost, 514
+
+            socktype = self.config['config']['logging']['syslog']['socket']
+            if socktype == "tcp":
+                socktype = socket.SOCK_STREAM
+            else:
+                socktype = socket.SOCK_DGRAM
+
+            sysloghandler = logging.handlers.SysLogHandler(address=loghost,socktype=socktype)
+            sysloghandler.setLevel(loglevel)
+            self.logger.addHandler(sysloghandler)
+            sysloghandler.setFormatter(formatter)
 
         logging.basicConfig(level=loglevel)
         self.logger.info("Logger initialized.")
